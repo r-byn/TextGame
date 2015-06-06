@@ -14,15 +14,33 @@ namespace TextGame
 
         public static Random rnd = new Random();
 
+        public static List<MapPiece> map = new List<MapPiece>();
+
         static void Main(string[] args)
         {
+            map = generateMap(32, 32);
 
             player.health = 10;
-            enemies = createEnemies(rnd.Next(1, 1000));
+            enemies = createEnemies(rnd.Next(1, 5));
 
             foreach(Enemy enemy in enemies)
             {
                 System.Console.Write("Enemy name: " + enemy.name + " Enemy health: " + enemy.health.ToString() + " Enemy damage: " + enemy.damage.ToString());
+            }
+
+            int last = 0;
+            foreach(var entry in map)
+            {
+                int x = entry.x;
+
+                if (x != last)
+                {
+                    Console.WriteLine("\n");
+                }
+
+                Console.Write(rendermap(entry));
+
+                last = x;
             }
 
             while(gameover())
@@ -66,6 +84,67 @@ namespace TextGame
             }
 
             return toreturn;
+        }
+
+        public static List<MapPiece> generateMap (int x, int y)
+        {
+            List<int> xs = new List<int>();
+            List<int> ys = new List<int>();
+            List<decimal> positions = new List<decimal>();
+            List<MapPiece> toreturn = new List<MapPiece>();
+
+            while(x > 0)
+            {
+                xs.Add(x);
+                x--;
+            }
+
+            while(y > 0)
+            {
+                ys.Add(y);
+                y--;
+            }
+
+            //creates a map reference for each piece. i.e if 32x32 1.1, 2.1, 2.2 32.32, etc etc
+            foreach(int axis in xs)
+            {
+                foreach(int verts in ys)
+                {
+                    MapPiece piece = new MapPiece();
+
+                    piece.x = axis;
+                    piece.y = verts;
+
+                    if (rnd.Next(0, 60) > 20)
+                    {
+                        piece.isAccessible = true;
+                    }
+
+                    try
+                    {
+                        toreturn.Add(piece);
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+
+            return toreturn;
+
+        }
+
+        public static string rendermap(MapPiece piece)
+        {
+            if(piece.isAccessible == true)
+            {
+                return "X";
+            }
+            else
+            {
+                return "O";
+            }
         }
     }
 }

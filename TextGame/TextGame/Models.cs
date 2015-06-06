@@ -19,4 +19,17 @@ namespace TextGame
     {
         public int health { get; set; }
     }
+
+    public class MapPiece
+    {
+        public int x { get; set; }
+
+        public int y { get; set; }
+
+        public Enemy enemy { get; set; }
+
+        public bool isAccessible { get; set; }
+
+        public String message { get; set; }
+    }
 }
