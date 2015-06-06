@@ -1,1 +1,6 @@
 C:\Users\User\Documents\GitHub\TextGame\TextGame\TextGame\bin\Debug\TextGame.exe.config
+C:\Users\User\Documents\GitHub\TextGame\TextGame\TextGame\bin\Debug\TextGame.exe
+C:\Users\User\Documents\GitHub\TextGame\TextGame\TextGame\bin\Debug\TextGame.pdb
+C:\Users\User\Documents\GitHub\TextGame\TextGame\TextGame\obj\Debug\TextGame.csprojResolveAssemblyReference.cache
+C:\Users\User\Documents\GitHub\TextGame\TextGame\TextGame\obj\Debug\TextGame.exe
+C:\Users\User\Documents\GitHub\TextGame\TextGame\TextGame\obj\Debug\TextGame.pdb
