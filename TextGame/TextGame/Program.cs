@@ -16,9 +16,16 @@ namespace TextGame
 
         public static List<MapPiece> map = new List<MapPiece>();
 
+        public static int currentX;
+
+        public static int currentY;
+
         static void Main(string[] args)
         {
             map = generateMap(32, 32);
+
+            currentX = 1;
+            currentY = 1;
 
             player.health = 10;
             enemies = createEnemies(rnd.Next(1, 5));
@@ -29,6 +36,7 @@ namespace TextGame
             }
 
             int last = 0;
+
             foreach(var entry in map)
             {
                 int x = entry.x;
@@ -41,18 +49,17 @@ namespace TextGame
                 Console.Write(rendermap(entry));
 
                 last = x;
-            }
+            }        
 
             while(gameover())
             {
-                String test = System.Console.ReadLine() + ".. yes it is";
+                checkEvents();
 
-                System.Console.WriteLine(test);
+                System.Console.WriteLine("Where shall I go, my liege?");
 
-                System.Console.WriteLine("How much damage shall I do?");
-                int damage = Convert.ToInt32(System.Console.ReadLine());
+                String dir = System.Console.ReadLine();
 
-                player.health = player.health - damage;
+                moveLocation(dir);
             }           
 
             
@@ -115,10 +122,14 @@ namespace TextGame
                     piece.x = axis;
                     piece.y = verts;
 
-                    if (rnd.Next(0, 60) > 20)
+                    piece.isAccessible = chanceAccessible();
+
+                    if(!piece.isAccessible)
                     {
-                        piece.isAccessible = true;
+                        piece.whyNotAccessible = accessibleReason();
                     }
+
+                    piece.enemy = chanceEnemy();
 
                     try
                     {
@@ -135,6 +146,44 @@ namespace TextGame
 
         }
 
+        public static Enemy chanceEnemy()
+        {
+            if(rnd.Next(0, 10) > 3)
+            {
+                Enemy enemy = new Enemy();
+                enemy.name = "dickbutt";
+                enemy.health = rnd.Next(5, 25);
+                enemy.damage = rnd.Next(1, 8);
+
+                return enemy;
+            }
+
+            return null;
+        }
+
+        public static bool chanceAccessible()
+        {
+            if (rnd.Next(0, 60) > 20)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static string accessibleReason()
+        {
+            List<string> reasons = new List<string>();
+
+            reasons.Add("Two elves busy masturbating, don't want to disturb!");
+            reasons.Add("A rogue invisible wall blocks your way");
+            reasons.Add("A brothel appears to be this way, do not want to be led into temptation!");
+            reasons.Add("Some other thing, to do with something blocks your way");
+            
+
+            return reasons.OrderBy(s => Guid.NewGuid()).First();
+        }
+
         public static string rendermap(MapPiece piece)
         {
             if(piece.isAccessible == true)
@@ -144,6 +193,114 @@ namespace TextGame
             else
             {
                 return "O";
+            }
+        }
+
+        public static bool moveLocation(string dir)
+        {
+            try
+            {
+                switch (dir)
+                {
+                    case "N":
+                        MapPiece goingToN = getPiece(currentX, currentY - 1);
+                        if (goingToN.isAccessible && goingToN != null)
+                        {
+                            currentY = currentY - 1;
+                            return true;
+                        }
+                        else
+                        {
+                            Console.WriteLine(goingToN.whyNotAccessible);
+                            return false;
+                        }
+                        break;
+                    case "S":
+                        MapPiece goingToS = getPiece(currentX, currentY + 1);
+                        if (goingToS.isAccessible && goingToS != null)
+                        {
+                            currentY = currentY + 1;
+                            return true;
+                        }
+                        else
+                        {
+                            Console.WriteLine(goingToS.whyNotAccessible);
+                            return false;
+                        }
+                        break;
+                    case "W":
+                        MapPiece goingToW = getPiece(currentX - 1, currentY);
+                        if (goingToW.isAccessible && goingToW != null)
+                        {
+                            currentX = currentX - 1;
+                            return true;
+                        }
+                        else
+                        {
+                            Console.WriteLine(goingToW.whyNotAccessible);
+                            return false;
+                        }
+                        break;
+                    case "E":
+                        MapPiece goingToE = getPiece(currentX + 1, currentY);
+                        if (goingToE.isAccessible && goingToE != null)
+                        {
+                            currentX = currentX + 1;
+                            return true;
+                        }
+                        else
+                        {
+                            Console.WriteLine(goingToE.whyNotAccessible);
+                            return false;
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("That's not a real direction, pillock");
+                        return false;
+                }
+            }
+
+            catch(NullReferenceException e)
+            {
+                Console.WriteLine("The world ends, don't want to fall off a cliff");
+                return false;
+            }
+           
+        }
+
+        public static MapPiece getPiece(int x, int y)
+        {
+            foreach(MapPiece piece in map)
+            {
+                if(piece.x == x)
+                {
+                    if(piece.y == y)
+                    {
+                        return piece;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public static void checkEvents()
+        {
+            MapPiece piece = getPiece(currentX, currentY);
+
+            if(piece.enemy != null)
+            {
+                Console.WriteLine("A " + piece.enemy.name + " wishes to fight!");
+                Console.WriteLine("It has " + piece.enemy.health + " health and does " + piece.enemy.damage + "damage!");
+                while(piece.enemy.health > 0)
+                {
+
+                    Console.WriteLine("How much damage should we do?");
+                    piece.enemy.health = piece.enemy.health - Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("The best strikes you!");
+                    player.health = player.health - piece.enemy.damage;
+
+                }
             }
         }
     }

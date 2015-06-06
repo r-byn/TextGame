@@ -28,8 +28,28 @@ namespace TextGame
 
         public Enemy enemy { get; set; }
 
+        public Shop shop { get; set; }
+
         public bool isAccessible { get; set; }
 
+        public string whyNotAccessible { get; set; }
+
         public String message { get; set; }
+    }
+
+    public class Shop
+    {
+        public string name { get; set; }
+
+        public List<Item> items { get; set; }
+    }
+
+    public class Item
+    {
+        public decimal price { get; set; }
+
+        public string name { get; set; }
+
+        public int damage { get; set; }
     }
 }
