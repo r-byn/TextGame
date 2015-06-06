@@ -56,7 +56,7 @@ namespace TextGame
             {
                 checkEvents();
 
-                System.Console.WriteLine("Where shall I go, my liege?");
+                System.Console.WriteLine("Which way shall I go?");
 
                 String dir = System.Console.ReadLine();
 
@@ -297,10 +297,32 @@ namespace TextGame
                 {
 
                     Console.WriteLine("What should I do?");
-                    piece.enemy.health = piece.enemy.health - Convert.ToInt32(Console.ReadLine());
-                    Console.WriteLine("The best strikes you for " + piece.enemy.damage.ToString());
+                    String todo = Console.ReadLine();
+
+                    switch(todo)
+                    {
+                        case "attack":
+                            //sumin
+                            piece.enemy.health = piece.enemy.health - player.damage;
+                            if(piece.enemy.health > 0)
+                            {
+                                Console.WriteLine("Enemy health is now " + piece.enemy.health.ToString());
+                            } 
+                  
+                            if(piece.enemy.health <= 0)
+                            {
+                                Console.WriteLine("Enemy is now dead!");
+                            }
+                            break;
+                        default:
+                            Console.WriteLine("That is no an option");
+                            break;
+                    }
+
+                    Console.WriteLine("The enemy strikes you for " + piece.enemy.damage.ToString());
                     player.health = player.health - piece.enemy.damage;
-                     Console.WriteLine("Your health is now" + player.health.ToString());
+                    
+                    Console.WriteLine("Your health is now " + player.health.ToString());
 
                 }
                 piece.enemy = null;
