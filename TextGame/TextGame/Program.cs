@@ -24,26 +24,29 @@ namespace TextGame
         {
             map = generateMap(32, 32);
 
+            pathBuilder();
+
             currentX = 1;
             currentY = 1;
 
             player.health = 50;
             player.damage = 8;
-            enemies = createEnemies(rnd.Next(1, 5));
+          /*  enemies = createEnemies(rnd.Next(1, 5));
 
             foreach(Enemy enemy in enemies)
             {
                 System.Console.Write("Enemy name: " + enemy.name + " Enemy health: " + enemy.health.ToString() + " Enemy damage: " + enemy.damage.ToString());
-            }
+            } */
 
             int last = 0;
 
-            foreach(var entry in map)
+            foreach (var entry in map)
             {
                 int x = entry.x;
 
                 if (x != last)
                 {
+
                     Console.WriteLine("\n");
                 }
 
@@ -95,7 +98,7 @@ namespace TextGame
         }
 
         public static List<MapPiece> generateMap (int x, int y)
-        {
+    {
             List<int> xs = new List<int>();
             List<int> ys = new List<int>();
             List<decimal> positions = new List<decimal>();
@@ -118,26 +121,27 @@ namespace TextGame
             {
                 foreach(int verts in ys)
                 {
-                    MapPiece piece = new MapPiece();
+                        MapPiece piece = new MapPiece();
 
-                    piece.x = axis;
-                    piece.y = verts;
+                        piece.x = axis;
+                        piece.y = verts;
 
-                    piece.isAccessible = chanceAccessible();
+                        piece.isAccessible = chanceAccessible();
 
-                    if(!piece.isAccessible)
-                    {
-                        piece.whyNotAccessible = accessibleReason();
-                    }
+                        if (!piece.isAccessible)
+                        {
+                            piece.whyNotAccessible = accessibleReason();
+                        }
 
-                    piece.enemy = chanceEnemy();
+                        piece.enemy = chanceEnemy();
+                        piece.shop = chanceShop();
 
-                    try
-                    {
-                        toreturn.Add(piece);
-                    }
-                    catch
-                    {
+                        try
+                        {
+                            toreturn.Add(piece);
+                        }
+                        catch
+                        {
 
                     }
                 }
@@ -147,6 +151,19 @@ namespace TextGame
 
         }
 
+        public static Shop chanceShop()
+        {
+            if (rnd.Next(0, 10) > 8)
+            {
+                Shop shop = new Shop();
+                shop.name = "Shop";
+                            
+
+                return shop;
+            }
+
+            return null;
+        }
         public static Enemy chanceEnemy()
         {
             if(rnd.Next(0, 10) > 5)
@@ -185,7 +202,7 @@ namespace TextGame
             return reasons.OrderBy(s => Guid.NewGuid()).First();
         }
 
-        public static string rendermap(MapPiece piece)
+       public static string rendermap(MapPiece piece)
         {
             if(piece.isAccessible == true)
             {
@@ -195,6 +212,86 @@ namespace TextGame
             {
                 return "O";
             }
+        }
+
+        public static void pathBuilder()
+        {
+            foreach(MapPiece piece in map)
+            {
+                if(!checkAround(piece.x, piece.y))
+                {
+                    int dir = rnd.Next(1, 4);
+                    if(piece.y == 1)
+                    {
+                        while(dir == 1)
+                        {
+                            dir = rnd.Next(1, 4);
+                        }
+                    }
+                    if (piece.y == 32)
+                    {
+                        while (dir == 3)
+                        {
+                            dir = rnd.Next(1, 4);
+                        }
+                    }
+                    if (piece.x == 1)
+                    {
+                        while (dir == 4)
+                        {
+                            dir = rnd.Next(1, 4);
+                        }
+                    }
+                    if (piece.x == 32)
+                    {
+                        while (dir == 2)
+                        {
+                            dir = rnd.Next(1, 4);
+                        }
+                    }
+                    switch(dir)
+                    {
+                        case 1:
+                            pathFixer("N", piece.x, piece.y);
+                            break;
+                        case 2:
+                            pathFixer("E", piece.x, piece.y);
+                            break;
+                        case 3:
+                            pathFixer("S", piece.x, piece.y);
+                            break;
+                        case 4:
+                            pathFixer("W", piece.x, piece.y);
+                            break;
+
+
+                    }
+                }
+            }
+        }
+
+        public static void pathFixer(string dir, int x, int y)
+        {
+            switch(dir)
+            {
+                case "N":
+                    y = y - 1;
+                    break;
+
+                case "E":
+                    x = x + 1;
+                    break;
+
+                case "S":
+                    y = y + 1;
+                    break;
+
+                case "W":
+                    x = x - 1;
+                    break;
+            }
+
+            map.Where(d => d.x == x && d.y == y).First().isAccessible = true;
         }
 
         public static bool moveLocation(string dir)
@@ -261,7 +358,7 @@ namespace TextGame
                 }
             }
 
-            catch(NullReferenceException e)
+            catch(NullReferenceException)
             {
                 Console.WriteLine("The world ends, don't want to fall off a cliff");
                 return false;
@@ -285,10 +382,96 @@ namespace TextGame
             return null;
         }
 
+        public static bool checkAround(int x, int y)
+        {
+            if(!checkDirectional(x,y,"N"))
+            {
+                if(!checkDirectional(x,y,"E"))
+                {
+                    if(!checkDirectional(x,y,"S"))
+                    {
+                        if(!checkDirectional(x,y,"W"))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public static bool checkDirectional(int x, int y, string dir)
+        {
+            try
+            {
+                switch (dir)
+                {
+                    case "N":
+                        MapPiece goingToN = getPiece(x, y - 1);
+                        if (goingToN.isAccessible && goingToN != null)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                        break;
+                    case "S":
+                        MapPiece goingToS = getPiece(x, y + 1);
+                        if (goingToS.isAccessible && goingToS != null)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                        break;
+                    case "W":
+                        MapPiece goingToW = getPiece(x - 1, y);
+                        if (goingToW.isAccessible && goingToW != null)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                        break;
+                    case "E":
+                        MapPiece goingToE = getPiece(x + 1, y);
+                        if (goingToE.isAccessible && goingToE != null)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("That's not a real direction, pillock");
+                        return false;
+                }
+            }
+
+            catch (NullReferenceException)
+            {
+                return false;
+            }
+        }
+
         public static void checkEvents()
         {
             MapPiece piece = getPiece(currentX, currentY);
 
+            if (piece.shop != null)
+            {
+                Console.WriteLine("a shop");
+
+            }
             if(piece.enemy != null)
             {
                 Console.WriteLine("A " + piece.enemy.name + " wishes to fight!");
@@ -318,12 +501,13 @@ namespace TextGame
                             Console.WriteLine("That is no an option");
                             break;
                     }
+                    if (piece.enemy.health > 0)
+                    {
+                        Console.WriteLine("The enemy strikes you for " + piece.enemy.damage.ToString());
+                        player.health = player.health - piece.enemy.damage;
 
-                    Console.WriteLine("The enemy strikes you for " + piece.enemy.damage.ToString());
-                    player.health = player.health - piece.enemy.damage;
-                    
-                    Console.WriteLine("Your health is now " + player.health.ToString());
-
+                        Console.WriteLine("Your health is now " + player.health.ToString());
+                    }
                 }
                 piece.enemy = null;
             }
