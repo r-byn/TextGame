@@ -27,7 +27,8 @@ namespace TextGame
             currentX = 1;
             currentY = 1;
 
-            player.health = 10;
+            player.health = 50;
+            player.damage = 8;
             enemies = createEnemies(rnd.Next(1, 5));
 
             foreach(Enemy enemy in enemies)
@@ -148,10 +149,10 @@ namespace TextGame
 
         public static Enemy chanceEnemy()
         {
-            if(rnd.Next(0, 10) > 3)
+            if(rnd.Next(0, 10) > 5)
             {
                 Enemy enemy = new Enemy();
-                enemy.name = "dickbutt";
+                enemy.name = "enemy";
                 enemy.health = rnd.Next(5, 25);
                 enemy.damage = rnd.Next(1, 8);
 
@@ -175,9 +176,9 @@ namespace TextGame
         {
             List<string> reasons = new List<string>();
 
-            reasons.Add("Two elves busy masturbating, don't want to disturb!");
+            reasons.Add("Two elves busy sleeping, don't want to disturb!");
             reasons.Add("A rogue invisible wall blocks your way");
-            reasons.Add("A brothel appears to be this way, do not want to be led into temptation!");
+            reasons.Add("A sweet shop appears to be this way, do not want to be led into temptation!");
             reasons.Add("Some other thing, to do with something blocks your way");
             
 
@@ -295,12 +296,14 @@ namespace TextGame
                 while(piece.enemy.health > 0)
                 {
 
-                    Console.WriteLine("How much damage should we do?");
+                    Console.WriteLine("What should I do?");
                     piece.enemy.health = piece.enemy.health - Convert.ToInt32(Console.ReadLine());
-                    Console.WriteLine("The best strikes you!");
+                    Console.WriteLine("The best strikes you for " + piece.enemy.damage.ToString());
                     player.health = player.health - piece.enemy.damage;
+                     Console.WriteLine("Your health is now" + player.health.ToString());
 
                 }
+                piece.enemy = null;
             }
         }
     }

@@ -18,6 +18,7 @@ namespace TextGame
     public class Player
     {
         public int health { get; set; }
+        public int damage { get; set; }
     }
 
     public class MapPiece
