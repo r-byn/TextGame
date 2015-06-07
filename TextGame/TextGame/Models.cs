@@ -19,9 +19,13 @@ namespace TextGame
     {
         public int health { get; set; }
         public int damage { get; set; }
+        public List<Item> inventory { get; set; }
+
     }
 
-    public class MapPiece
+
+    
+      public class MapPiece
     {
         public int x { get; set; }
 
@@ -42,7 +46,7 @@ namespace TextGame
     {
         public string name { get; set; }
 
-        public List<Item> items { get; set; }
+        public List<Item> shopItems { get; set; }
     }
 
     public class Item
@@ -52,5 +56,11 @@ namespace TextGame
         public string name { get; set; }
 
         public int damage { get; set; }
+
+        public int quantity { get; set; }
+
+
     }
+
+    
 }
