@@ -559,11 +559,14 @@ namespace TextGame
                                     player.money++;
                                     Console.WriteLine("GOLD = " +player.money);
                                 }
-
+                            
                                 Item someitem = new Item();
 
                                 someitem.name = "Coin";
-                               // player.inventory.Add(someitem);
+                                someitem.damage = 0;
+                                someitem.price = 0;
+                                someitem.quantity = 1;
+                                player.inventory.Add(someitem);
 
                                 if (player.inventory != null)
                                 {

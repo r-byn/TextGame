@@ -61,7 +61,7 @@ namespace TextGame
 
         public int damage { get; set; }
 
-        public int quantity { get; set; }
+        //public int quantity { get; set; }
 
 
     }
