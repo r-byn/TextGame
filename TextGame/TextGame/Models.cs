@@ -19,7 +19,9 @@ namespace TextGame
     {
         public int health { get; set; }
         public int damage { get; set; }
-        public List<Item> inventory { get; set; }
+        public List<Item> inventory { get; set; }  
+        public int money { get; set; }
+        public bool isAlive { get; set; }
 
     }
 
@@ -40,7 +42,9 @@ namespace TextGame
         public string whyNotAccessible { get; set; }
 
         public String message { get; set; }
-    }
+
+        public bool isMountain { get; set; }
+      }
 
     public class Shop
     {

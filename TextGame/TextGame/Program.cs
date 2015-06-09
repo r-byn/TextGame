@@ -10,6 +10,8 @@ namespace TextGame
     {
         public static Player player = new Player();
 
+        public static List<Item> inventory = new List<Item>();     
+
         public static List<Enemy> enemies = new List<Enemy>();
 
         public static Random rnd = new Random();
@@ -20,6 +22,8 @@ namespace TextGame
 
         public static int currentY;
 
+        public static int caveEnterance;
+
         static void Main(string[] args)
         {
             map = generateMap(32, 32);
@@ -28,9 +32,11 @@ namespace TextGame
 
             currentX = 1;
             currentY = 1;
+            caveEnterance = 0;
 
             player.health = 50;
             player.damage = 8;
+            player.isAlive = true;
           /*  enemies = createEnemies(rnd.Next(1, 5));
 
             foreach(Enemy enemy in enemies)
@@ -53,31 +59,34 @@ namespace TextGame
                 Console.Write(rendermap(entry));
 
                 last = x;
-            }        
+            }
 
-            while(gameover())
+            while (gameRunning())
             {
                 checkEvents();
 
-                System.Console.WriteLine("Which way shall I go?");
+                System.Console.WriteLine("Which way should I go?");
 
                 String dir = System.Console.ReadLine();
 
                 moveLocation(dir);
+
+                checkLife();
             }           
 
             
         }
 
-        public static bool gameover ()
+        public static bool gameRunning ()
         {
-            if(player.health <= 0)
+            if(player.isAlive == false)
             {
                 return false;
             }
             return true;
         }
 
+        
         public static List<Enemy> createEnemies(int number)
         {
             List<Enemy> toreturn = new List<Enemy>();
@@ -85,9 +94,9 @@ namespace TextGame
             while(number > 0)
             {
                 Enemy toadd = new Enemy();
-                toadd.health = rnd.Next(1, 20);
+                toadd.health = rnd.Next(10, 20);
                 toadd.damage = rnd.Next(1, 5);
-                toadd.name = "Some prick" + number.ToString();
+                toadd.name = "an enemy" + number.ToString();
 
                 toreturn.Add(toadd);
 
@@ -103,7 +112,7 @@ namespace TextGame
             List<int> ys = new List<int>();
             List<decimal> positions = new List<decimal>();
             List<MapPiece> toreturn = new List<MapPiece>();
-
+            
             while(x > 0)
             {
                 xs.Add(x);
@@ -131,11 +140,21 @@ namespace TextGame
                         if (!piece.isAccessible)
                         {
                             piece.whyNotAccessible = accessibleReason();
+                            piece.isMountain = false; 
                         }
+
+                        if (piece.x >= 32)
+                        {
+                            piece.isAccessible = false;
+                            piece.isMountain = true; 
+
+                        }
+
+                                                
 
                         piece.enemy = chanceEnemy();
                         piece.shop = chanceShop();
-
+                    
                         try
                         {
                             toreturn.Add(piece);
@@ -164,6 +183,7 @@ namespace TextGame
 
             return null;
         }
+
         public static Enemy chanceEnemy()
         {
             if(rnd.Next(0, 10) > 5)
@@ -179,9 +199,21 @@ namespace TextGame
             return null;
         }
 
+        public static void checkLife() {
+
+            if (player.health <= 0)
+            {
+                player.isAlive = false;
+                Console.WriteLine("YOURE DEAD!");
+                
+               
+            }
+
+        }
+
         public static bool chanceAccessible()
         {
-            if (rnd.Next(0, 60) > 20)
+            if (rnd.Next(0, 60) > 15)
             {
                 return true;
             }
@@ -193,25 +225,47 @@ namespace TextGame
         {
             List<string> reasons = new List<string>();
 
-            reasons.Add("Two elves busy sleeping, don't want to disturb!");
-            reasons.Add("A rogue invisible wall blocks your way");
-            reasons.Add("A sweet shop appears to be this way, do not want to be led into temptation!");
-            reasons.Add("Some other thing, to do with something blocks your way");
-            
+            reasons.Add("Two elves are sleeping, I don't want to disturb them!");
+            reasons.Add("The forest is far too dense to go this way!");
+            reasons.Add("I'm not even sure what that animal is, but it doesnt look friendly, best not to disburb it!");
+            reasons.Add("I'm not going to walk through that thicket, those branches look thorny!");
+            reasons.Add("A dilapidated golem blocks your path. There's no getting around it.");
+            reasons.Add("A strange mushroom discharges spores into the air. Best not to walk through them.");
+            reasons.Add("A large web blocks the path. I'm not going to stick around to find out what made it.");
+            reasons.Add("A pair of sprites are having a domestic dispute. I'll leave them be.");
+            reasons.Add("*You hear a low growl as a wolf warns you away from her pups*");
+            reasons.Add("A rune is carved into the nearby trees. You recognize it as 'danger this way.' I better not get sidetracked.");
+
+                   
 
             return reasons.OrderBy(s => Guid.NewGuid()).First();
         }
 
-       public static string rendermap(MapPiece piece)
+        public static string rendermap(MapPiece piece)
         {
-            if(piece.isAccessible == true)
+
+            if (piece.isAccessible == false)
             {
+                if (piece.isMountain == true)
+                {
+                    return "M";
+                }
+            }
+
+            if (piece.isAccessible == true)
+            {
+                if (piece.shop != null)
+                {
+                    return "S";
+                }
                 return "X";
             }
             else
             {
                 return "O";
             }
+
+            
         }
 
         public static void pathBuilder()
@@ -291,8 +345,11 @@ namespace TextGame
                     break;
             }
 
-            map.Where(d => d.x == x && d.y == y).First().isAccessible = true;
-        }
+             map.Where(d => d.x == x && d.y == y).First().isAccessible = true; 
+                
+            }
+           
+        
 
         public static bool moveLocation(string dir)
         {
@@ -353,7 +410,7 @@ namespace TextGame
                         }
                         break;
                     default:
-                        Console.WriteLine("That's not a real direction, pillock");
+                        Console.WriteLine("N, E, S, or W");
                         return false;
                 }
             }
@@ -452,7 +509,7 @@ namespace TextGame
                         }
                         break;
                     default:
-                        Console.WriteLine("That's not a real direction, pillock");
+                        Console.WriteLine("n, e, s or w ?");
                         return false;
                 }
             }
@@ -469,7 +526,7 @@ namespace TextGame
 
             if (piece.shop != null)
             {
-                Console.WriteLine("a shop");
+                Console.WriteLine("A shop");
 
             }
             if(piece.enemy != null)
@@ -478,35 +535,60 @@ namespace TextGame
                 Console.WriteLine("It has " + piece.enemy.health + " health and does " + piece.enemy.damage + "damage!");
                 while(piece.enemy.health > 0)
                 {
-
+                    checkLife();
                     Console.WriteLine("What should I do?");
                     String todo = Console.ReadLine();
 
                     switch(todo)
                     {
-                        case "attack":
+                        case "ATTACK":
                             //sumin
                             piece.enemy.health = piece.enemy.health - player.damage;
                             if(piece.enemy.health > 0)
                             {
                                 Console.WriteLine("Enemy health is now " + piece.enemy.health.ToString());
-                            } 
-                  
-                            if(piece.enemy.health <= 0)
+                            }
+
+                            if (piece.enemy.health <= 0)
                             {
                                 Console.WriteLine("Enemy is now dead!");
+
+
+                                if (rnd.Next(0, 10) > 5)
+                                {
+                                    player.money++;
+                                    Console.WriteLine("GOLD = " +player.money);
+                                }
+
+                                Item someitem = new Item();
+
+                                someitem.name = "Coin";
+                               // player.inventory.Add(someitem);
+
+                                if (player.inventory != null)
+                                {
+
+                                    foreach (Item item in player.inventory)
+                                    {
+                                        Console.WriteLine(item.name);
+                                    }
+                                }
                             }
+                                
+                             
                             break;
                         default:
-                            Console.WriteLine("That is no an option");
+                            Console.WriteLine("That is not an option");
                             break;
                     }
                     if (piece.enemy.health > 0)
                     {
+                        
                         Console.WriteLine("The enemy strikes you for " + piece.enemy.damage.ToString());
                         player.health = player.health - piece.enemy.damage;
 
                         Console.WriteLine("Your health is now " + player.health.ToString());
+                        
                     }
                 }
                 piece.enemy = null;
