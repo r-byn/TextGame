@@ -19,7 +19,7 @@ namespace TextGame
     {
         public int health { get; set; }
         public int damage { get; set; }
-        public List<Item> inventory { get; set; }  
+        public List<item> inventory { get; set; }  
         public int money { get; set; }
         public bool isAlive { get; set; }
 
@@ -41,30 +41,38 @@ namespace TextGame
 
         public string whyNotAccessible { get; set; }
 
-        public String message { get; set; }
+        public string genMessage { get; set; }
+
+        // public String message { get; set; }
 
         public bool isMountain { get; set; }
+
+        public bool isSpawn { get; set; }
+
+        public Spawn spawn { get; set; }
       }
 
     public class Shop
     {
         public string name { get; set; }
 
-        public List<Item> shopItems { get; set; }
+        public List<item> shopItems { get; set; }
     }
 
-    public class Item
+    public class item
+{
+	    public decimal price { get; set; }
+	
+	    public string name { get; set; }
+	
+	    public int damage { get; set; }
+	
+	    public int quantity { get; set; }
+	
+}
+
+    public class Spawn
     {
-        public decimal price { get; set; }
-
         public string name { get; set; }
-
-        public int damage { get; set; }
-
-        //public int quantity { get; set; }
-
-
     }
-
-    
 }

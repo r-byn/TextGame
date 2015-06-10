@@ -10,7 +10,7 @@ namespace TextGame
     {
         public static Player player = new Player();
 
-        public static List<Item> inventory = new List<Item>();     
+        public static List<item> inventory = new List<item>();     
 
         public static List<Enemy> enemies = new List<Enemy>();
 
@@ -106,12 +106,14 @@ namespace TextGame
             return toreturn;
         }
 
-        public static List<MapPiece> generateMap (int x, int y)
+
+      public static List<MapPiece> generateMap (int x, int y)
     {
             List<int> xs = new List<int>();
             List<int> ys = new List<int>();
             List<decimal> positions = new List<decimal>();
             List<MapPiece> toreturn = new List<MapPiece>();
+            
             
             while(x > 0)
             {
@@ -140,20 +142,32 @@ namespace TextGame
                         if (!piece.isAccessible)
                         {
                             piece.whyNotAccessible = accessibleReason();
-                            piece.isMountain = false; 
+                            piece.isMountain = false;
+                            piece.isSpawn = false;
                         }
+
+                       
 
                         if (piece.x >= 32)
                         {
                             piece.isAccessible = false;
-                            piece.isMountain = true; 
+                            piece.isMountain = true;
+                            piece.isSpawn = false;
 
                         }
-
+                        if (piece.x <= 1)
+                        {
+                            if (piece.y <=1)
+                            { piece.isAccessible = true;
+                              piece.isSpawn = true;
+                              piece.spawn = generateSpawn();
+                            }
+                        }
                                                 
 
                         piece.enemy = chanceEnemy();
                         piece.shop = chanceShop();
+                         
                     
                         try
                         {
@@ -186,18 +200,36 @@ namespace TextGame
 
         public static Enemy chanceEnemy()
         {
-            if(rnd.Next(0, 10) > 5)
+            
+
+            if (rnd.Next(0, 10) > 5)
             {
-                Enemy enemy = new Enemy();
-                enemy.name = "enemy";
-                enemy.health = rnd.Next(5, 25);
-                enemy.damage = rnd.Next(1, 8);
+                    Enemy enemy = new Enemy();
+                    enemy.name = "enemy";
+                    enemy.health = rnd.Next(5, 25);
+                    enemy.damage = rnd.Next(1, 8);
 
-                return enemy;
+                    return enemy;
+                
             }
-
             return null;
         }
+
+        public static Spawn generateSpawn()
+        {
+         
+                Spawn spawn = new Spawn();
+                spawn.name = "Castle";
+                
+
+                return spawn;
+            }
+
+              
+        
+
+
+
 
         public static void checkLife() {
 
@@ -205,6 +237,7 @@ namespace TextGame
             {
                 player.isAlive = false;
                 Console.WriteLine("YOURE DEAD!");
+                
                 
                
             }
@@ -216,6 +249,7 @@ namespace TextGame
             if (rnd.Next(0, 60) > 15)
             {
                 return true;
+                
             }
 
             return false;
@@ -234,11 +268,27 @@ namespace TextGame
             reasons.Add("A large web blocks the path. I'm not going to stick around to find out what made it.");
             reasons.Add("A pair of sprites are having a domestic dispute. I'll leave them be.");
             reasons.Add("*You hear a low growl as a wolf warns you away from her pups*");
-            reasons.Add("A rune is carved into the nearby trees. You recognize it as 'danger this way.' I better not get sidetracked.");
+            reasons.Add("*A rune is carved into the nearby trees. You recognize it as 'danger this way.'* I better not get sidetracked.");
 
                    
 
             return reasons.OrderBy(s => Guid.NewGuid()).First();
+        }
+
+        public static string generalMessage()
+        {
+            List<string> message = new List<string>();
+
+            message.Add("Two birds are preparing a nest up in that tree!");
+            message.Add("I hope this is the right way.");
+            message.Add("Great, I stepped in a puddle.");
+            message.Add("I hope this Lich isn't as fearsome as they say!");
+            message.Add("At least the pay is good, that's if I live of course...");
+            message.Add("*Rabbits dash past your feet, away into the dense forest*");
+            message.Add("These flowers are looking worse for ware, thats not a good sign.");
+          
+
+            return message.OrderBy(s => Guid.NewGuid()).First();
         }
 
         public static string rendermap(MapPiece piece)
@@ -257,6 +307,10 @@ namespace TextGame
                 if (piece.shop != null)
                 {
                     return "S";
+                }
+                if (piece.spawn != null)
+                {
+                    return "#";
                 }
                 return "X";
             }
@@ -345,7 +399,7 @@ namespace TextGame
                     break;
             }
 
-             map.Where(d => d.x == x && d.y == y).First().isAccessible = true; 
+            // map.Where(d => d.x == x && d.y == y).First().isAccessible = true; 
                 
             }
            
@@ -529,9 +583,20 @@ namespace TextGame
                 Console.WriteLine("A shop");
 
             }
+
+            if (piece.spawn != null) { 
+                Console.WriteLine("\n\n\n\n\n\n\n\n\n\n\n\n\n QUEEN: Oh, Adventurer! Please help us. There is an evil Lich living in a cave in the mountains to the South. \n It sends it's minions to terrorise the town and has taken over the forest, \n Beast have started living there, the branches of trees have grown horns, and it's getting worse and worse by the day! \n Soon the Lich's taint will break down the city walls and our people will be endangered! \n I understand this is a trumendous task and your live will undoubtly be at risk, but if succesfull you will be greatly rewarded!");
+                Console.WriteLine("\n YOU: Yes of course your majesty! I will try my best to destroy the Lich and undo the evil it has tainted you forest with!");
+                Console.WriteLine("\n QUEEN: Please be careful not to get lost! I'll show you to the forest.\n The forest begins just beyong this gate, remember, youre going to need to head South! May the God's bless your path.");
+                Console.WriteLine("\n *The masaive gate door slowly opens as you try to scope out what lies ahead in the dense forest, but its far too dark. \n You begin to walk towards the forest and the door is closed behind you.");
+                Console.WriteLine("\n A deep boom vibrates the floor as the gate doors slam together.\n\n\n");
+                Console.WriteLine("----------------------------------------------------\n Input N, E, S, or W to chose direction\n Attack by inputting ATTACK\n----------------------------------------------------\n\n\n");
+            }
+
+
             if(piece.enemy != null)
             {
-                Console.WriteLine("A " + piece.enemy.name + " wishes to fight!");
+                Console.WriteLine("An " + piece.enemy.name + " wishes to fight!");
                 Console.WriteLine("It has " + piece.enemy.health + " health and does " + piece.enemy.damage + "damage!");
                 while(piece.enemy.health > 0)
                 {
@@ -560,18 +625,18 @@ namespace TextGame
                                     Console.WriteLine("GOLD = " +player.money);
                                 }
                             
-                                Item someitem = new Item();
+                                item someitem = new item();
 
                                 someitem.name = "Coin";
                                 someitem.damage = 0;
                                 someitem.price = 0;
                                 someitem.quantity = 1;
-                                player.inventory.Add(someitem);
+//player.inventory.Add(someitem);
 
                                 if (player.inventory != null)
                                 {
 
-                                    foreach (Item item in player.inventory)
+                                    foreach (item item in player.inventory)
                                     {
                                         Console.WriteLine(item.name);
                                     }
